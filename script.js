@@ -346,11 +346,22 @@ document.addEventListener('DOMContentLoaded', () => {
     playPianoChime(randomMelody, now + 0.6, 2.5, 0.035);
   }
 
-  // Dual-mode audio: Background song (Shohruhxon & Umidaxon - Xatlar) or procedural synthesizer
+  // Dual-mode audio: Background song (Shohruhxon & Umidaxon - Xatlar)
   const bgAudioEl = document.getElementById('bg-music') || new Audio('assets/music.mp3');
   bgAudioEl.loop = true;
   bgAudioEl.volume = 0.85;
   let hasCustomMp3 = false;
+
+  // Real-time audio hardware state sync
+  bgAudioEl.addEventListener('play', () => {
+    isPlaying = true;
+    updateAudioUI(true);
+  });
+
+  bgAudioEl.addEventListener('pause', () => {
+    isPlaying = false;
+    updateAudioUI(false);
+  });
 
   // Guarantee infinite looping when the song ends
   bgAudioEl.addEventListener('ended', () => {
@@ -360,36 +371,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function startMusic() {
     initAudio();
-    isPlaying = true;
-    updateAudioUI(true);
 
     // Try playing the MP3 song first
     const playPromise = bgAudioEl.play();
     if (playPromise !== undefined) {
       playPromise
         .then(() => {
+          isPlaying = true;
           hasCustomMp3 = true;
-          if (synthInterval) clearInterval(synthInterval);
+          updateAudioUI(true);
+          if (synthInterval) { clearInterval(synthInterval); synthInterval = null; }
         })
         .catch(() => {
-          // If browser policy blocked without user gesture, or file error, prepare synthesizer fallback
-          hasCustomMp3 = false;
-          playRomanticProgression();
-          if (synthInterval) clearInterval(synthInterval);
-          synthInterval = setInterval(() => {
-            if (isPlaying && !hasCustomMp3) {
-              playRomanticProgression();
-            }
-          }, 3600);
+          // Autoplay blocked by browser policy without user gesture yet
+          isPlaying = false;
+          updateAudioUI(false);
         });
-    } else {
-      playRomanticProgression();
-      if (synthInterval) clearInterval(synthInterval);
-      synthInterval = setInterval(() => {
-        if (isPlaying && !hasCustomMp3) {
-          playRomanticProgression();
-        }
-      }, 3600);
     }
   }
 
@@ -399,11 +396,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (bgAudioEl) {
       bgAudioEl.pause();
     }
-    if (synthInterval) clearInterval(synthInterval);
+    if (synthInterval) { clearInterval(synthInterval); synthInterval = null; }
   }
 
   function toggleMusic() {
-    if (isPlaying) {
+    if (isPlaying && !bgAudioEl.paused) {
       stopMusic();
       showToast("Kuy to'xtatildi 🌙");
     } else {
@@ -420,7 +417,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (statusText) statusText.textContent = "Kuy: Yangramoqda";
     } else {
       wave?.classList.remove('playing');
-      if (statusText) statusText.textContent = "Kuy: To'xtatilgan";
+      if (statusText) statusText.textContent = "Kuy: Bosing 🎵";
     }
   }
 
@@ -430,24 +427,28 @@ document.addEventListener('DOMContentLoaded', () => {
   // 1. Immediately attempt autoplay as soon as page loads
   setTimeout(() => {
     startMusic();
-  }, 300);
+  }, 200);
 
   // 2. Browser Autoplay Policy: if browser blocked audio before user gesture,
   // the VERY FIRST touch, click, scroll or keypress will instantly trigger music!
-  const interactionEvents = ['click', 'touchstart', 'pointerdown', 'scroll', 'wheel', 'keydown'];
-  const handleAnyUserInteraction = () => {
-    if (!isPlaying || bgAudioEl.paused) {
-      startMusic();
+  const gestureEvents = ['click', 'touchstart', 'touchend', 'pointerdown', 'scroll', 'keydown'];
+  const unlockAudio = () => {
+    if (bgAudioEl.paused) {
+      bgAudioEl.play().then(() => {
+        isPlaying = true;
+        hasCustomMp3 = true;
+        updateAudioUI(true);
+        gestureEvents.forEach(evt => {
+          window.removeEventListener(evt, unlockAudio, { capture: true });
+          document.removeEventListener(evt, unlockAudio, { capture: true });
+        });
+      }).catch(() => {});
     }
-    interactionEvents.forEach(evt => {
-      window.removeEventListener(evt, handleAnyUserInteraction, { capture: true });
-      document.removeEventListener(evt, handleAnyUserInteraction, { capture: true });
-    });
   };
 
-  interactionEvents.forEach(evt => {
-    window.addEventListener(evt, handleAnyUserInteraction, { capture: true, passive: true });
-    document.addEventListener(evt, handleAnyUserInteraction, { capture: true, passive: true });
+  gestureEvents.forEach(evt => {
+    window.addEventListener(evt, unlockAudio, { capture: true, passive: true });
+    document.addEventListener(evt, unlockAudio, { capture: true, passive: true });
   });
 
 
