@@ -554,11 +554,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const milkMochaActor = document.getElementById('milk-mocha-actor');
     if (milkMochaActor) {
       gsap.fromTo(milkMochaActor,
-        { x: '-55vw', y: 15, rotation: -4 },
+        { x: '-28vw', y: 20, rotation: -3 },
         {
-          x: '55vw',
-          y: -15,
-          rotation: 4,
+          x: '28vw',
+          y: -20,
+          rotation: 3,
           ease: 'none',
           scrollTrigger: {
             trigger: '#stage-milk-mocha',
@@ -568,6 +568,16 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
       );
+      // Gentle pulsating heart between them
+      gsap.to('#milk-mocha-heart', {
+        scale: 1.2,
+        y: -10,
+        transformOrigin: 'center center',
+        repeat: -1,
+        yoyo: true,
+        duration: 0.9,
+        ease: 'power1.inOut'
+      });
     }
 
     // -------------------------------------------------------------
@@ -577,11 +587,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const teddyActor = document.getElementById('teddy-actor');
     if (teddyActor) {
       gsap.fromTo(teddyActor,
-        { x: '70vw', y: 30, rotation: 6 },
+        { x: '35vw', y: 25, rotation: 4 },
         {
-          x: '-70vw',
-          y: -30,
-          rotation: -6,
+          x: '-35vw',
+          y: -25,
+          rotation: -4,
           ease: 'none',
           scrollTrigger: {
             trigger: '#stage-teddy-bear',
@@ -595,16 +605,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // -------------------------------------------------------------
     // NEW VECTOR PAGE 2: KUZGI SARIQ BARGLAR — SEPTEMBER
-    // Golden and amber leaves swirling diagonally down-right!
+    // 12 Golden and amber leaves swirling diagonally down-right!
     // -------------------------------------------------------------
     const autumnStage = document.getElementById('stage-autumn-september');
     if (autumnStage) {
-      gsap.to('#a-leaf-1', { x: 280, y: 320, rotation: 380, ease: 'none', scrollTrigger: { trigger: autumnStage, start: 'top bottom', end: 'bottom top', scrub: 1 } });
-      gsap.to('#a-leaf-2', { x: 340, y: 360, rotation: -320, ease: 'none', scrollTrigger: { trigger: autumnStage, start: 'top bottom', end: 'bottom top', scrub: 1.3 } });
-      gsap.to('#a-leaf-3', { x: 220, y: 280, rotation: 260, ease: 'none', scrollTrigger: { trigger: autumnStage, start: 'top bottom', end: 'bottom top', scrub: 1.5 } });
-      gsap.to('#a-leaf-4', { x: 300, y: 340, rotation: -290, ease: 'none', scrollTrigger: { trigger: autumnStage, start: 'top bottom', end: 'bottom top', scrub: 1.2 } });
-      gsap.to('#a-leaf-5', { x: 260, y: 300, rotation: 340, ease: 'none', scrollTrigger: { trigger: autumnStage, start: 'top bottom', end: 'bottom top', scrub: 1.4 } });
-      gsap.to('#a-leaf-6', { x: 240, y: 350, rotation: -280, ease: 'none', scrollTrigger: { trigger: autumnStage, start: 'top bottom', end: 'bottom top', scrub: 1.6 } });
+      const autumnLeavesConfig = [
+        { id: '#a-leaf-1', x: 260, y: 320, rot: 360, scrub: 1 },
+        { id: '#a-leaf-2', x: 320, y: 380, rot: -340, scrub: 1.3 },
+        { id: '#a-leaf-3', x: 220, y: 300, rot: 280, scrub: 1.5 },
+        { id: '#a-leaf-4', x: 290, y: 350, rot: -290, scrub: 1.2 },
+        { id: '#a-leaf-5', x: 250, y: 320, rot: 330, scrub: 1.4 },
+        { id: '#a-leaf-6', x: 240, y: 360, rot: -280, scrub: 1.6 },
+        { id: '#a-leaf-7', x: 280, y: 340, rot: 400, scrub: 1.1 },
+        { id: '#a-leaf-8', x: 310, y: 390, rot: -320, scrub: 1.4 },
+        { id: '#a-leaf-9', x: 230, y: 310, rot: 260, scrub: 1.3 },
+        { id: '#a-leaf-10', x: 270, y: 330, rot: -300, scrub: 1.5 },
+        { id: '#a-leaf-11', x: 300, y: 370, rot: 350, scrub: 1.2 },
+        { id: '#a-leaf-12', x: 250, y: 340, rot: -270, scrub: 1.6 }
+      ];
+      autumnLeavesConfig.forEach(leaf => {
+        gsap.to(leaf.id, {
+          x: leaf.x,
+          y: leaf.y,
+          rotation: leaf.rot,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: autumnStage,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: leaf.scrub
+          }
+        });
+      });
     }
 
     // -------------------------------------------------------------
@@ -657,31 +689,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const flowerStage = document.getElementById('stage-flower-bloom');
     if (flowerStage) {
       gsap.from('#bloom-flower-center', {
-        scale: 0.2,
-        rotation: -30,
+        scale: 0.15,
+        rotation: -25,
         opacity: 0,
-        y: 90,
+        y: 110,
         ease: 'power2.out',
         scrollTrigger: {
           trigger: flowerStage,
-          start: 'top 75%',
-          end: 'bottom 60%',
+          start: 'top 80%',
+          end: 'bottom 50%',
           scrub: 1.2
         }
       });
       gsap.from(['#bloom-flower-1', '#bloom-flower-2'], {
-        scale: 0.1,
+        scale: 0.15,
         opacity: 0,
-        y: 80,
+        y: 90,
         stagger: 0.2,
         ease: 'power2.out',
         scrollTrigger: {
           trigger: flowerStage,
-          start: 'top 70%',
-          end: 'bottom 60%',
+          start: 'top 75%',
+          end: 'bottom 50%',
           scrub: 1
         }
       });
+      gsap.fromTo('#garden-bf-1',
+        { x: -50, y: 30, rotation: -15 },
+        { x: 70, y: -40, rotation: 15, ease: 'none', scrollTrigger: { trigger: flowerStage, start: 'top bottom', end: 'bottom top', scrub: 1.3 } }
+      );
+      gsap.fromTo('#garden-bf-2',
+        { x: 50, y: 40, rotation: 12 },
+        { x: -60, y: -50, rotation: -12, ease: 'none', scrollTrigger: { trigger: flowerStage, start: 'top bottom', end: 'bottom top', scrub: 1.5 } }
+      );
     }
 
     // -------------------------------------------------------------
@@ -730,14 +770,35 @@ document.addEventListener('DOMContentLoaded', () => {
     // -------------------------------------------------------------
     const dandelionStage = document.getElementById('stage-dandelion');
     if (dandelionStage) {
-      gsap.to('#d-seed-1', { x: -240, y: -260, rotation: -90, opacity: 0.2, ease: 'none', scrollTrigger: { trigger: dandelionStage, start: 'top 60%', end: 'bottom 20%', scrub: 1.2 } });
-      gsap.to('#d-seed-2', { x: 40, y: -340, rotation: 45, opacity: 0.1, ease: 'none', scrollTrigger: { trigger: dandelionStage, start: 'top 60%', end: 'bottom 20%', scrub: 1 } });
-      gsap.to('#d-seed-3', { x: 260, y: -250, rotation: 80, opacity: 0.2, ease: 'none', scrollTrigger: { trigger: dandelionStage, start: 'top 60%', end: 'bottom 20%', scrub: 1.3 } });
-      gsap.to('#d-seed-4', { x: -320, y: -40, rotation: -120, opacity: 0.15, ease: 'none', scrollTrigger: { trigger: dandelionStage, start: 'top 60%', end: 'bottom 20%', scrub: 1.1 } });
-      gsap.to('#d-seed-5', { x: 310, y: -30, rotation: 110, opacity: 0.15, ease: 'none', scrollTrigger: { trigger: dandelionStage, start: 'top 60%', end: 'bottom 20%', scrub: 1.4 } });
-      gsap.to('#d-seed-6', { x: -220, y: 220, rotation: -140, opacity: 0.2, ease: 'none', scrollTrigger: { trigger: dandelionStage, start: 'top 60%', end: 'bottom 20%', scrub: 1.2 } });
-      gsap.to('#d-seed-7', { x: 240, y: 230, rotation: 130, opacity: 0.2, ease: 'none', scrollTrigger: { trigger: dandelionStage, start: 'top 60%', end: 'bottom 20%', scrub: 1.3 } });
-      gsap.to('#d-seed-8', { x: 180, y: -380, rotation: 60, opacity: 0.1, ease: 'none', scrollTrigger: { trigger: dandelionStage, start: 'top 60%', end: 'bottom 20%', scrub: 1.5 } });
+      const dandelionSeeds = [
+        { id: '#d-seed-1', x: -260, y: -280, rot: -90, scrub: 1.2 },
+        { id: '#d-seed-2', x: 0, y: -350, rot: 45, scrub: 1 },
+        { id: '#d-seed-3', x: 270, y: -270, rot: 80, scrub: 1.3 },
+        { id: '#d-seed-4', x: -340, y: -30, rot: -120, scrub: 1.1 },
+        { id: '#d-seed-5', x: 330, y: -20, rot: 110, scrub: 1.4 },
+        { id: '#d-seed-6', x: -240, y: 240, rot: -140, scrub: 1.2 },
+        { id: '#d-seed-7', x: 250, y: 250, rot: 130, scrub: 1.3 },
+        { id: '#d-seed-8', x: 190, y: -380, rot: 60, scrub: 1.5 },
+        { id: '#d-seed-9', x: -160, y: -360, rot: -70, scrub: 1.25 },
+        { id: '#d-seed-10', x: -360, y: 120, rot: -100, scrub: 1.35 },
+        { id: '#d-seed-11', x: 350, y: 130, rot: 120, scrub: 1.15 },
+        { id: '#d-seed-12', x: 0, y: 320, rot: 150, scrub: 1.45 }
+      ];
+      dandelionSeeds.forEach(seed => {
+        gsap.to(seed.id, {
+          x: seed.x,
+          y: seed.y,
+          rotation: seed.rot,
+          opacity: 0.15,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: dandelionStage,
+            start: 'top 65%',
+            end: 'bottom 15%',
+            scrub: seed.scrub
+          }
+        });
+      });
     }
 
     // -------------------------------------------------------------
@@ -816,15 +877,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // -------------------------------------------------------------
     // NEW VECTOR PAGE 5: KAPALAKLAR RAQSI — BUTTERFLIES DANCE
-    // Zigzag dynamic trajectories across the screen!
+    // Zigzag dynamic trajectories across the screen for all 9 butterflies!
     // -------------------------------------------------------------
     const butterfliesStage = document.getElementById('stage-butterflies-dance');
     if (butterfliesStage) {
-      gsap.fromTo('#v-bf-1', { x: '50vw', y: -80 }, { x: '-50vw', y: 120, ease: 'none', scrollTrigger: { trigger: butterfliesStage, start: 'top bottom', end: 'bottom top', scrub: 1.2 } });
-      gsap.fromTo('#v-bf-2', { x: '60vw', y: -40 }, { x: '-40vw', y: 90, ease: 'none', scrollTrigger: { trigger: butterfliesStage, start: 'top bottom', end: 'bottom top', scrub: 1.5 } });
-      gsap.fromTo('#v-bf-3', { x: '45vw', y: 80 }, { x: '-60vw', y: -60, ease: 'none', scrollTrigger: { trigger: butterfliesStage, start: 'top bottom', end: 'bottom top', scrub: 1.1 } });
-      gsap.fromTo('#v-bf-4', { x: '55vw', y: 40 }, { x: '-45vw', y: -80, ease: 'none', scrollTrigger: { trigger: butterfliesStage, start: 'top bottom', end: 'bottom top', scrub: 1.4 } });
-      gsap.fromTo('#v-bf-5', { x: '65vw', y: 60 }, { x: '-55vw', y: 140, ease: 'none', scrollTrigger: { trigger: butterfliesStage, start: 'top bottom', end: 'bottom top', scrub: 1.6 } });
+      const butterflyFlight = [
+        { id: '#v-bf-1', fromX: '38vw', toX: '-38vw', fromY: -60, toY: 100, scrub: 1.2 },
+        { id: '#v-bf-2', fromX: '45vw', toX: '-32vw', fromY: -30, toY: 80, scrub: 1.4 },
+        { id: '#v-bf-3', fromX: '35vw', toX: '-45vw', fromY: 60, toY: -50, scrub: 1.1 },
+        { id: '#v-bf-4', fromX: '42vw', toX: '-35vw', fromY: 30, toY: -70, scrub: 1.3 },
+        { id: '#v-bf-5', fromX: '48vw', toX: '-42vw', fromY: 50, toY: 120, scrub: 1.5 },
+        { id: '#v-bf-6', fromX: '-35vw', toX: '40vw', fromY: 80, toY: -90, scrub: 1.25 },
+        { id: '#v-bf-7', fromX: '32vw', toX: '-40vw', fromY: -80, toY: 60, scrub: 1.35 },
+        { id: '#v-bf-8', fromX: '-42vw', toX: '36vw', fromY: -40, toY: 110, scrub: 1.45 },
+        { id: '#v-bf-9', fromX: '40vw', toX: '-36vw', fromY: 70, toY: -60, scrub: 1.15 }
+      ];
+      butterflyFlight.forEach(bf => {
+        gsap.fromTo(bf.id,
+          { x: bf.fromX, y: bf.fromY },
+          {
+            x: bf.toX,
+            y: bf.toY,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: butterfliesStage,
+              start: 'top bottom',
+              end: 'bottom top',
+              scrub: bf.scrub
+            }
+          }
+        );
+      });
     }
 
     // Chapter 3: Featured Uploaded Couple Artwork Reveal
@@ -918,11 +1001,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const dovesFlightActor = document.getElementById('doves-flight-actor');
     if (dovesFlightActor) {
       gsap.fromTo(dovesFlightActor,
-        { x: '-55vw', y: 130, rotation: -6 },
+        { x: '-32vw', y: 100, rotation: -5 },
         {
-          x: '55vw',
-          y: -130,
-          rotation: 6,
+          x: '32vw',
+          y: -100,
+          rotation: 5,
           ease: 'none',
           scrollTrigger: {
             trigger: '#stage-doves-letter',
@@ -932,6 +1015,15 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
       );
+      // Gentle wing fluttering
+      gsap.to('.dove-left path, .dove-right path', {
+        rotation: 4,
+        transformOrigin: 'bottom center',
+        repeat: -1,
+        yoyo: true,
+        duration: 0.45,
+        ease: 'power1.inOut'
+      });
     }
 
     // -------------------------------------------------------------
@@ -992,9 +1084,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const crescentMoon = document.getElementById('celestial-crescent');
     if (crescentMoon) {
       gsap.to(crescentMoon, {
-        x: -60,
-        y: -90,
-        scale: 1.15,
+        x: 65,
+        y: -110,
+        scale: 1.22,
         ease: 'none',
         scrollTrigger: {
           trigger: '#stage-crescent-city',
@@ -1014,9 +1106,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const balloons = ['#v-balloon-1', '#v-balloon-2', '#v-balloon-3', '#v-balloon-4', '#v-balloon-5', '#v-balloon-6'];
       balloons.forEach((bId, idx) => {
         gsap.to(bId, {
-          y: -(170 + idx * 22),
-          x: (idx % 2 === 0 ? 30 : -30),
-          rotation: (idx % 2 === 0 ? 8 : -8),
+          y: -(240 + idx * 30),
+          x: (idx % 2 === 0 ? 35 : -35),
+          rotation: (idx % 2 === 0 ? 10 : -10),
           ease: 'none',
           scrollTrigger: {
             trigger: balloonsStage,
