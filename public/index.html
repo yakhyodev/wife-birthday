@@ -957,21 +957,64 @@ body {
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
+  background: #080310;
 }
 
 .scenic-bg-img {
+  position: absolute;
+  inset: 0;
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center;
-  filter: brightness(0.42) contrast(1.12);
-  transform: scale(1.04);
+  filter: brightness(0.72) saturate(1.08) contrast(1.06);
+  transform: scale(1.015);
 }
 
 .scenic-bg-overlay {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at center, rgba(8, 3, 16, 0.35) 0%, rgba(8, 3, 16, 0.88) 75%, #080310 100%);
+  background: radial-gradient(circle at center, rgba(8, 3, 16, 0.12) 0%, rgba(8, 3, 16, 0.58) 78%, rgba(8, 3, 16, 0.82) 100%);
+}
+
+.hero-section,
+.flower-bloom-section,
+.vector-lanterns-section {
+  isolation: isolate;
+}
+
+.hero-section .hero-content {
+  position: relative;
+  z-index: 3;
+}
+
+.hero-section .scenic-bg-img {
+  filter: brightness(0.58) saturate(1.08) contrast(1.06);
+}
+
+.hero-section .scenic-bg-overlay {
+  background: linear-gradient(180deg, rgba(8, 3, 16, 0.45) 0%, rgba(8, 3, 16, 0.18) 48%, rgba(8, 3, 16, 0.7) 100%);
+}
+
+.flower-bloom-section .floral-garden-svg,
+.flower-bloom-section .interlude-container,
+.vector-lanterns-section .vector-lanterns-stage {
+  z-index: 2;
+}
+
+@media (max-width: 640px) {
+  .hero-section .scenic-bg-img {
+    object-position: 33% center;
+  }
+
+  .flower-bloom-section .scenic-bg-img {
+    object-position: 50% 55%;
+  }
+
+  .vector-lanterns-section .scenic-bg-img {
+    object-position: 52% center;
+  }
 }
 
 .constellation-glow-center {
@@ -2675,10 +2718,13 @@ body {
 }
 
 .couple-art-portrait {
-  width: 100%;
+  display: block;
+  width: min(66vw, 400px, calc(58vh * 0.666015625));
+  max-width: none;
   height: auto;
-  max-height: 58vh;
+  max-height: none;
   object-fit: contain;
+  margin: 0 auto;
   border-radius: 28px;
 }
 
@@ -3051,7 +3097,6 @@ body {
 
 
 </style>
-  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
@@ -3075,7 +3120,7 @@ body {
           <span class="sound-wave">
             <i></i><i></i><i></i><i></i>
           </span>
-          <span id="audio-status-text">Kuy: Yoqiq</span>
+          <span id="audio-status-text">Kuy: Bosing 🎵</span>
         </button>
       </div>
     </div>
@@ -3128,7 +3173,7 @@ body {
           <button id="start-journey-btn" class="btn-royal-glass">
             <span class="btn-inner">
               <span class="btn-icon">💌</span>
-              <span class="btn-text">Sayohatimizni Boshlash</span>
+              <span class="btn-text">Musiqa Bilan Sayohatni Boshlash</span>
               <i data-lucide="arrow-down" class="btn-arrow"></i>
             </span>
           </button>
@@ -5190,6 +5235,7 @@ document.addEventListener('DOMContentLoaded', () => {
   bgAudioEl.loop = true;
   bgAudioEl.volume = 0.85;
   let hasCustomMp3 = false;
+  let musicStartPromise = null;
 
   // Real-time audio hardware state sync
   bgAudioEl.addEventListener('play', () => {
@@ -5208,25 +5254,38 @@ document.addEventListener('DOMContentLoaded', () => {
     bgAudioEl.play().catch(() => {});
   });
 
-  function startMusic() {
+  function startMusic({ notifyOnBlock = false } = {}) {
     initAudio();
 
-    // Try playing the MP3 song first
-    const playPromise = bgAudioEl.play();
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          isPlaying = true;
-          hasCustomMp3 = true;
-          updateAudioUI(true);
-          if (synthInterval) { clearInterval(synthInterval); synthInterval = null; }
-        })
-        .catch(() => {
-          // Autoplay blocked by browser policy without user gesture yet
-          isPlaying = false;
-          updateAudioUI(false);
-        });
+    if (!bgAudioEl.paused) {
+      isPlaying = true;
+      updateAudioUI(true);
+      return Promise.resolve(true);
     }
+
+    // Deduplicate simultaneous touch/pointer/click requests on mobile browsers.
+    if (musicStartPromise) return musicStartPromise;
+
+    musicStartPromise = Promise.resolve(bgAudioEl.play())
+      .then(() => {
+        isPlaying = true;
+        hasCustomMp3 = true;
+        updateAudioUI(true);
+        if (synthInterval) { clearInterval(synthInterval); synthInterval = null; }
+        return true;
+      })
+      .catch(() => {
+        // Sound autoplay needs a real user gesture in modern browsers.
+        isPlaying = false;
+        updateAudioUI(false);
+        if (notifyOnBlock) showToast("Musiqani yoqish uchun kuy tugmasini bosing 🎵");
+        return false;
+      })
+      .finally(() => {
+        musicStartPromise = null;
+      });
+
+    return musicStartPromise;
   }
 
   function stopMusic() {
@@ -5238,13 +5297,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (synthInterval) { clearInterval(synthInterval); synthInterval = null; }
   }
 
-  function toggleMusic() {
-    if (isPlaying && !bgAudioEl.paused) {
+  async function toggleMusic() {
+    if (!bgAudioEl.paused) {
       stopMusic();
       showToast("Kuy to'xtatildi 🌙");
     } else {
-      startMusic();
-      showToast("Xatlar qo'shig'i yangramoqda 🎵");
+      const started = await startMusic({ notifyOnBlock: true });
+      if (started) showToast("Xatlar qo'shig'i yangramoqda 🎵");
     }
   }
 
@@ -5254,9 +5313,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (playing) {
       wave?.classList.add('playing');
       if (statusText) statusText.textContent = "Kuy: Yangramoqda";
+      audioToggleBtn?.setAttribute('aria-pressed', 'true');
     } else {
       wave?.classList.remove('playing');
       if (statusText) statusText.textContent = "Kuy: Bosing 🎵";
+      audioToggleBtn?.setAttribute('aria-pressed', 'false');
     }
   }
 
@@ -5268,25 +5329,27 @@ document.addEventListener('DOMContentLoaded', () => {
     startMusic();
   }, 200);
 
-  // 2. Browser Autoplay Policy: if browser blocked audio before user gesture,
-  // the VERY FIRST touch, click, scroll or keypress will instantly trigger music!
-  const gestureEvents = ['click', 'touchstart', 'touchend', 'pointerdown', 'scroll', 'keydown'];
-  const unlockAudio = () => {
-    if (bgAudioEl.paused) {
-      bgAudioEl.play().then(() => {
-        isPlaying = true;
-        hasCustomMp3 = true;
-        updateAudioUI(true);
-        gestureEvents.forEach(evt => {
-          window.removeEventListener(evt, unlockAudio, { capture: true });
-          document.removeEventListener(evt, unlockAudio, { capture: true });
-        });
-      }).catch(() => {});
+  // 2. If autoplay is blocked, the first ordinary gesture unlocks the song.
+  // Dedicated music controls are skipped here and handle their own click once.
+  const gestureEvents = ['pointerdown', 'touchend', 'keydown'];
+  const removeAudioUnlockListeners = () => {
+    gestureEvents.forEach(evt => {
+      document.removeEventListener(evt, unlockAudio, { capture: true });
+    });
+  };
+
+  const unlockAudio = (event) => {
+    if (event.target?.closest?.('#audio-toggle-btn, #start-journey-btn')) return;
+    if (!bgAudioEl.paused) {
+      removeAudioUnlockListeners();
+      return;
     }
+    startMusic().then(started => {
+      if (started) removeAudioUnlockListeners();
+    });
   };
 
   gestureEvents.forEach(evt => {
-    window.addEventListener(evt, unlockAudio, { capture: true, passive: true });
     document.addEventListener(evt, unlockAudio, { capture: true, passive: true });
   });
 

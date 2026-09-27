@@ -351,6 +351,7 @@ document.addEventListener('DOMContentLoaded', () => {
   bgAudioEl.loop = true;
   bgAudioEl.volume = 0.85;
   let hasCustomMp3 = false;
+  let musicStartPromise = null;
 
   // Real-time audio hardware state sync
   bgAudioEl.addEventListener('play', () => {
@@ -369,25 +370,38 @@ document.addEventListener('DOMContentLoaded', () => {
     bgAudioEl.play().catch(() => {});
   });
 
-  function startMusic() {
+  function startMusic({ notifyOnBlock = false } = {}) {
     initAudio();
 
-    // Try playing the MP3 song first
-    const playPromise = bgAudioEl.play();
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          isPlaying = true;
-          hasCustomMp3 = true;
-          updateAudioUI(true);
-          if (synthInterval) { clearInterval(synthInterval); synthInterval = null; }
-        })
-        .catch(() => {
-          // Autoplay blocked by browser policy without user gesture yet
-          isPlaying = false;
-          updateAudioUI(false);
-        });
+    if (!bgAudioEl.paused) {
+      isPlaying = true;
+      updateAudioUI(true);
+      return Promise.resolve(true);
     }
+
+    // Deduplicate simultaneous touch/pointer/click requests on mobile browsers.
+    if (musicStartPromise) return musicStartPromise;
+
+    musicStartPromise = Promise.resolve(bgAudioEl.play())
+      .then(() => {
+        isPlaying = true;
+        hasCustomMp3 = true;
+        updateAudioUI(true);
+        if (synthInterval) { clearInterval(synthInterval); synthInterval = null; }
+        return true;
+      })
+      .catch(() => {
+        // Sound autoplay needs a real user gesture in modern browsers.
+        isPlaying = false;
+        updateAudioUI(false);
+        if (notifyOnBlock) showToast("Musiqani yoqish uchun kuy tugmasini bosing 🎵");
+        return false;
+      })
+      .finally(() => {
+        musicStartPromise = null;
+      });
+
+    return musicStartPromise;
   }
 
   function stopMusic() {
@@ -399,13 +413,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (synthInterval) { clearInterval(synthInterval); synthInterval = null; }
   }
 
-  function toggleMusic() {
-    if (isPlaying && !bgAudioEl.paused) {
+  async function toggleMusic() {
+    if (!bgAudioEl.paused) {
       stopMusic();
       showToast("Kuy to'xtatildi 🌙");
     } else {
-      startMusic();
-      showToast("Xatlar qo'shig'i yangramoqda 🎵");
+      const started = await startMusic({ notifyOnBlock: true });
+      if (started) showToast("Xatlar qo'shig'i yangramoqda 🎵");
     }
   }
 
@@ -415,9 +429,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (playing) {
       wave?.classList.add('playing');
       if (statusText) statusText.textContent = "Kuy: Yangramoqda";
+      audioToggleBtn?.setAttribute('aria-pressed', 'true');
     } else {
       wave?.classList.remove('playing');
       if (statusText) statusText.textContent = "Kuy: Bosing 🎵";
+      audioToggleBtn?.setAttribute('aria-pressed', 'false');
     }
   }
 
@@ -429,25 +445,27 @@ document.addEventListener('DOMContentLoaded', () => {
     startMusic();
   }, 200);
 
-  // 2. Browser Autoplay Policy: if browser blocked audio before user gesture,
-  // the VERY FIRST touch, click, scroll or keypress will instantly trigger music!
-  const gestureEvents = ['click', 'touchstart', 'touchend', 'pointerdown', 'scroll', 'keydown'];
-  const unlockAudio = () => {
-    if (bgAudioEl.paused) {
-      bgAudioEl.play().then(() => {
-        isPlaying = true;
-        hasCustomMp3 = true;
-        updateAudioUI(true);
-        gestureEvents.forEach(evt => {
-          window.removeEventListener(evt, unlockAudio, { capture: true });
-          document.removeEventListener(evt, unlockAudio, { capture: true });
-        });
-      }).catch(() => {});
+  // 2. If autoplay is blocked, the first ordinary gesture unlocks the song.
+  // Dedicated music controls are skipped here and handle their own click once.
+  const gestureEvents = ['pointerdown', 'touchend', 'keydown'];
+  const removeAudioUnlockListeners = () => {
+    gestureEvents.forEach(evt => {
+      document.removeEventListener(evt, unlockAudio, { capture: true });
+    });
+  };
+
+  const unlockAudio = (event) => {
+    if (event.target?.closest?.('#audio-toggle-btn, #start-journey-btn')) return;
+    if (!bgAudioEl.paused) {
+      removeAudioUnlockListeners();
+      return;
     }
+    startMusic().then(started => {
+      if (started) removeAudioUnlockListeners();
+    });
   };
 
   gestureEvents.forEach(evt => {
-    window.addEventListener(evt, unlockAudio, { capture: true, passive: true });
     document.addEventListener(evt, unlockAudio, { capture: true, passive: true });
   });
 
