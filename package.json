@@ -1,0 +1,19 @@
+{
+  "name": "mushtariy-happy-19",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Mushtariyim uchun romantik va nafis Happy 19 tabrik sayti",
+  "scripts": {
+    "dev": "npx -y serve . -l 3000",
+    "start": "npx -y serve . -l 3000"
+  },
+  "keywords": [
+    "birthday",
+    "love",
+    "glassmorphism",
+    "scrollytelling",
+    "mushtariy"
+  ],
+  "author": "Sizning Dasturchi Yoringiz",
+  "license": "MIT"
+}
