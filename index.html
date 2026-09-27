@@ -19,15 +19,14 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <!-- Preload Critical Media Assets -->
+  <link rel="preload" as="image" href="assets/aurora-lake.jpg" />
   <link rel="preload" as="image" href="assets/glass-flowers.jpg" />
   <link rel="preload" as="image" href="assets/couple-art.png" />
   <link rel="preload" as="image" href="assets/couple-desktop.jpg" />
   <link rel="preload" as="image" href="assets/couple-mobile.jpg" />
   <link rel="preload" as="audio" href="assets/music.mp3" />
 
-  <!-- GSAP for Rockstar/NatGeo level scroll & motion -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <!-- Scroll motion is provided locally by native-scroll.js (no CDN dependency). -->
 
   <!-- Custom Styles -->
   <style>
@@ -3092,6 +3091,223 @@ body {
   100% { transform: translateY(-16px) rotate(2deg); }
 }
 
+/* ==========================================================
+   RELIABLE MEDIA, AUDIO ENTRY & NATIVE SCROLL STORY ENGINE
+   ========================================================== */
+.experience-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 50% 35%, rgba(168, 85, 247, 0.28), transparent 42%),
+    linear-gradient(145deg, rgba(5, 2, 12, 0.94), rgba(24, 5, 28, 0.96));
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  transition: opacity 0.65s ease, visibility 0.65s ease;
+}
+
+.experience-gate.is-open {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.experience-gate-card {
+  width: min(520px, 92vw);
+  padding: clamp(28px, 6vw, 54px);
+  text-align: center;
+  border-radius: 34px;
+  border: 1px solid rgba(248, 180, 196, 0.32);
+  background: rgba(14, 6, 24, 0.74);
+  box-shadow: 0 35px 100px rgba(0, 0, 0, 0.72), 0 0 60px rgba(244, 63, 94, 0.18);
+}
+
+.experience-gate-mark {
+  display: block;
+  margin-bottom: 18px;
+  font-size: clamp(2.6rem, 9vw, 4.4rem);
+  filter: drop-shadow(0 0 24px rgba(244, 63, 94, 0.55));
+  animation: gate-heartbeat 1.8s ease-in-out infinite;
+}
+
+@keyframes gate-heartbeat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.09); }
+}
+
+.experience-gate-kicker {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--gold-accent);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.experience-gate-title {
+  margin: 0 0 12px;
+  color: #fff;
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 7vw, 3.35rem);
+  line-height: 1.05;
+}
+
+.experience-gate-copy {
+  margin: 0 auto 26px;
+  max-width: 390px;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.experience-start-btn {
+  width: 100%;
+  min-height: 58px;
+  border: 1px solid rgba(255,255,255,0.28);
+  border-radius: 999px;
+  color: #fff;
+  background: linear-gradient(135deg, #e11d48, #9333ea 58%, #f59e0b);
+  box-shadow: 0 16px 45px rgba(147, 51, 234, 0.35);
+  font: 700 0.95rem var(--font-sans);
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.experience-start-btn:hover,
+.experience-start-btn:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: 0 22px 56px rgba(244, 63, 94, 0.42);
+}
+
+.experience-gate-status {
+  min-height: 20px;
+  margin: 14px 0 0;
+  color: var(--rose-gold);
+  font-size: 0.78rem;
+}
+
+.journey-compass {
+  position: fixed;
+  top: 50%;
+  right: max(18px, env(safe-area-inset-right));
+  z-index: 180;
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  width: 90px;
+  padding: 13px 8px;
+  transform: translateY(-50%);
+  border: 1px solid rgba(248, 180, 196, 0.2);
+  border-radius: 22px;
+  color: #fff;
+  background: rgba(8, 3, 16, 0.66);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 18px 45px rgba(0,0,0,0.45);
+  pointer-events: none;
+}
+
+.journey-kicker,
+.journey-count {
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  letter-spacing: 0.09em;
+}
+
+.journey-direction {
+  color: var(--gold-glow);
+  font-size: 1.65rem;
+  line-height: 1;
+  text-shadow: 0 0 18px rgba(245, 158, 11, 0.75);
+}
+
+.journey-label {
+  max-width: 76px;
+  overflow: hidden;
+  color: var(--rose-gold);
+  font-size: 0.67rem;
+  font-weight: 700;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.native-scroll-engine {
+  scroll-behavior: smooth;
+  scroll-snap-type: y proximity;
+}
+
+.native-scroll-engine .section {
+  scroll-snap-align: start;
+  scroll-snap-stop: normal;
+}
+
+.native-scroll-engine .section.is-scene-active::before {
+  opacity: 0.78;
+}
+
+.native-scroll-engine #milk-mocha-actor,
+.native-scroll-engine #teddy-actor,
+.native-scroll-engine [id^="a-leaf-"],
+.native-scroll-engine [id^="bloom-flower-"],
+.native-scroll-engine [id^="garden-bf-"],
+.native-scroll-engine [id^="v-lantern-"],
+.native-scroll-engine [id^="d-seed-"],
+.native-scroll-engine #solar-stage,
+.native-scroll-engine [id^="orbit-ring-"],
+.native-scroll-engine [id^="v-bf-"],
+.native-scroll-engine #couple-parallax-img,
+.native-scroll-engine #couple-art-portrait,
+.native-scroll-engine #doves-flight-actor,
+.native-scroll-engine #endless-card,
+.native-scroll-engine [id^="v-balloon-"],
+.native-scroll-engine #birthday-cake-actor {
+  animation: none !important;
+  will-change: transform, opacity;
+}
+
+.media-asset,
+.glass-artwork-frame,
+.glass-rose-img,
+.couple-art-portrait {
+  visibility: visible !important;
+}
+
+.media-asset {
+  opacity: 1;
+}
+
+.media-error {
+  min-height: 240px;
+  background: radial-gradient(circle, rgba(244,63,94,0.28), rgba(8,3,16,0.92));
+}
+
+@media (max-width: 720px) {
+  .journey-compass {
+    top: auto;
+    right: 14px;
+    bottom: calc(76px + env(safe-area-inset-bottom));
+    width: 76px;
+    transform: none;
+    padding: 9px 6px;
+  }
+
+  .journey-kicker { display: none; }
+  .journey-direction { font-size: 1.35rem; }
+  .journey-label { font-size: 0.59rem; }
+  .experience-gate-card { border-radius: 28px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .native-scroll-engine { scroll-behavior: auto; }
+  .experience-gate-mark { animation: none; }
+}
+
 
 
 
@@ -3099,6 +3315,18 @@ body {
 </style>
 </head>
 <body>
+
+  <!-- A real user gesture is required by browsers before audible music can start. -->
+  <div class="experience-gate" id="experience-gate" role="dialog" aria-modal="true" aria-labelledby="experience-gate-title">
+    <div class="experience-gate-card">
+      <span class="experience-gate-mark" aria-hidden="true">💖</span>
+      <span class="experience-gate-kicker">YAXYO × MUSHTARIY • 19</span>
+      <h2 class="experience-gate-title" id="experience-gate-title">Sehrli sayohat boshlansin</h2>
+      <p class="experience-gate-copy">Musiqa, rasmlar va National Geographic uslubidagi ko‘p yo‘nalishli hikoyani birga oching.</p>
+      <button class="experience-start-btn" id="experience-start-btn" type="button">🎵 Musiqa va sayohatni boshlash</button>
+      <p class="experience-gate-status" id="experience-gate-status">Ovozli tajriba uchun bir marta bosing</p>
+    </div>
+  </div>
 
   <!-- Fullscreen Interactive Canvas Background (Stars, Nebulae, Petals, Cursor Light) -->
   <canvas id="cosmic-canvas"></canvas>
@@ -3116,7 +3344,7 @@ body {
 
       <div class="controls-group">
         <!-- Audio Play/Pause Button -->
-        <button id="audio-toggle-btn" class="glass-pill-btn" aria-label="Musiqani yoqish/o'chirish">
+        <button id="audio-toggle-btn" class="glass-pill-btn" aria-label="Musiqani yoqish/o'chirish" aria-pressed="false">
           <span class="sound-wave">
             <i></i><i></i><i></i><i></i>
           </span>
@@ -3611,7 +3839,7 @@ eternal.compile_happiness()</code></pre>
          ============================================================== -->
     <section class="section vector-interlude-section flower-bloom-section" id="stage-flower-bloom">
       <div class="scenic-bg-wrap">
-        <img src="assets/magical-garden.jpg" alt="Sehrli gullar bog'i" class="scenic-bg-img" loading="lazy" decoding="async" />
+        <img src="assets/magical-garden.jpg" alt="Sehrli gullar bog'i" class="scenic-bg-img" loading="eager" decoding="async" />
         <div class="scenic-bg-overlay"></div>
       </div>
       <div class="interlude-glow-aura aura-flowers"></div>
@@ -3698,7 +3926,7 @@ eternal.compile_happiness()</code></pre>
          ============================================================== -->
     <section class="section vector-lanterns-section" id="stage-vector-lanterns">
       <div class="scenic-bg-wrap">
-        <img src="assets/floating-lanterns.jpg" alt="Sehrli uchar chiroqlar osmoni" class="scenic-bg-img" loading="lazy" decoding="async" />
+        <img src="assets/floating-lanterns.jpg" alt="Sehrli uchar chiroqlar osmoni" class="scenic-bg-img" loading="eager" decoding="async" />
         <div class="scenic-bg-overlay"></div>
       </div>
       <div class="vector-lanterns-stage" id="vector-lanterns-stage">
@@ -5236,6 +5464,7 @@ document.addEventListener('DOMContentLoaded', () => {
   bgAudioEl.volume = 0.85;
   let hasCustomMp3 = false;
   let musicStartPromise = null;
+  let userRequestedPlayback = false;
 
   // Real-time audio hardware state sync
   bgAudioEl.addEventListener('play', () => {
@@ -5251,10 +5480,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Guarantee infinite looping when the song ends
   bgAudioEl.addEventListener('ended', () => {
     bgAudioEl.currentTime = 0;
-    bgAudioEl.play().catch(() => {});
+    if (userRequestedPlayback) bgAudioEl.play().catch(() => {});
   });
 
-  function startMusic({ notifyOnBlock = false } = {}) {
+  function startMusic({ notifyOnBlock = false, userInitiated = false } = {}) {
+    if (userInitiated) userRequestedPlayback = true;
     initAudio();
 
     if (!bgAudioEl.paused) {
@@ -5289,6 +5519,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function stopMusic() {
+    userRequestedPlayback = false;
     isPlaying = false;
     updateAudioUI(false);
     if (bgAudioEl) {
@@ -5302,7 +5533,7 @@ document.addEventListener('DOMContentLoaded', () => {
       stopMusic();
       showToast("Kuy to'xtatildi 🌙");
     } else {
-      const started = await startMusic({ notifyOnBlock: true });
+      const started = await startMusic({ notifyOnBlock: true, userInitiated: true });
       if (started) showToast("Xatlar qo'shig'i yangramoqda 🎵");
     }
   }
@@ -5324,10 +5555,24 @@ document.addEventListener('DOMContentLoaded', () => {
   const audioToggleBtn = document.getElementById('audio-toggle-btn');
   audioToggleBtn?.addEventListener('click', toggleMusic);
 
-  // 1. Immediately attempt autoplay as soon as page loads
-  setTimeout(() => {
-    startMusic();
-  }, 200);
+  // Audible autoplay is blocked by modern browsers. This fullscreen gate
+  // supplies the real user gesture required by Chrome, Safari and mobile WebViews.
+  const experienceGate = document.getElementById('experience-gate');
+  const experienceStartBtn = document.getElementById('experience-start-btn');
+  const experienceGateStatus = document.getElementById('experience-gate-status');
+  experienceStartBtn?.addEventListener('click', async () => {
+    experienceStartBtn.disabled = true;
+    if (experienceGateStatus) experienceGateStatus.textContent = 'Musiqa yuklanmoqda...';
+    const started = await startMusic({ notifyOnBlock: true, userInitiated: true });
+    if (started) {
+      if (experienceGateStatus) experienceGateStatus.textContent = 'Musiqa yangramoqda 🎵';
+      experienceGate?.classList.add('is-open');
+      setTimeout(() => experienceGate?.remove(), 750);
+    } else {
+      experienceStartBtn.disabled = false;
+      if (experienceGateStatus) experienceGateStatus.textContent = 'Yana bir marta bosing — brauzer ovozni kutmoqda';
+    }
+  });
 
   // 2. If autoplay is blocked, the first ordinary gesture unlocks the song.
   // Dedicated music controls are skipped here and handle their own click once.
@@ -5344,7 +5589,7 @@ document.addEventListener('DOMContentLoaded', () => {
       removeAudioUnlockListeners();
       return;
     }
-    startMusic().then(started => {
+    startMusic({ userInitiated: true }).then(started => {
       if (started) removeAudioUnlockListeners();
     });
   };
@@ -5352,6 +5597,22 @@ document.addEventListener('DOMContentLoaded', () => {
   gestureEvents.forEach(evt => {
     document.addEventListener(evt, unlockAudio, { capture: true, passive: true });
   });
+
+  // Keep the requested soundtrack alive during normal foreground browsing.
+  const resumeRequestedMusic = () => {
+    if (userRequestedPlayback && bgAudioEl.paused && document.visibilityState === 'visible') {
+      startMusic().catch(() => {});
+    }
+  };
+  document.addEventListener('visibilitychange', resumeRequestedMusic);
+  window.addEventListener('pageshow', resumeRequestedMusic);
+  bgAudioEl.addEventListener('stalled', resumeRequestedMusic);
+  bgAudioEl.addEventListener('suspend', () => {
+    if (userRequestedPlayback && bgAudioEl.readyState < HTMLMediaElement.HAVE_FUTURE_DATA) {
+      bgAudioEl.load();
+    }
+  });
+  setInterval(resumeRequestedMusic, 8000);
 
 
   /* ----------------------------------------------------------
@@ -6127,7 +6388,7 @@ document.addEventListener('DOMContentLoaded', () => {
      ---------------------------------------------------------- */
   const startJourneyBtn = document.getElementById('start-journey-btn');
   startJourneyBtn?.addEventListener('click', () => {
-    if (!isPlaying) startMusic();
+    if (!isPlaying) startMusic({ notifyOnBlock: true, userInitiated: true });
     const target = document.getElementById('code-destiny');
     target?.scrollIntoView({ behavior: 'smooth' });
     launchFireworks(window.innerWidth / 2, window.innerHeight * 0.7);
@@ -6357,5 +6618,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 </script>
+  <script src="native-scroll.js?v=20260928-2"></script>
 </body>
 </html>

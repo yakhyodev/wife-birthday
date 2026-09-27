@@ -1257,7 +1257,7 @@ document.addEventListener('DOMContentLoaded', () => {
      ---------------------------------------------------------- */
   const startJourneyBtn = document.getElementById('start-journey-btn');
   startJourneyBtn?.addEventListener('click', () => {
-    if (!isPlaying) startMusic();
+    if (!isPlaying) startMusic({ notifyOnBlock: true });
     const target = document.getElementById('code-destiny');
     target?.scrollIntoView({ behavior: 'smooth' });
     launchFireworks(window.innerWidth / 2, window.innerHeight * 0.7);

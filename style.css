@@ -3138,6 +3138,10 @@ body {
   0% { transform: translateY(0px) rotate(-1.5deg); }
   100% { transform: translateY(-16px) rotate(2deg); }
 }
+
+/* Native scroll story UI lives inline in index.html for standalone reliability. */
+.media-asset,.glass-artwork-frame,.glass-rose-img,.couple-art-portrait { visibility: visible !important; }
+.media-asset { opacity: 1; }
 .balloons-card {
   padding: 34px 30px;
   border-radius: 28px;
