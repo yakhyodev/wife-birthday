@@ -627,7 +627,15 @@ body {
   box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.8), 0 0 30px rgba(244, 63, 94, 0.2);
 }
 
-/* CHAPTER 1: TERMINAL CARD */
+/* CHAPTER 1: TERMINAL CARD & CORE PICTURE VISIBILITY */
+.terminal-card,
+.glass-artwork-frame,
+.couple-art-portrait,
+.couple-art-feature-wrapper {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
 .terminal-card {
   max-width: 820px;
   margin: 0 auto;
@@ -905,9 +913,10 @@ body {
 /* CHAPTER 3: CINEMATIC FULL SCREEN SECTION (ROCKSTAR / NATGEO STYLE) */
 .cinematic-section {
   position: relative;
-  padding: 160px 0;
+  padding: 120px 0;
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   overflow: hidden;
@@ -939,6 +948,30 @@ body {
   inset: 0;
   background: radial-gradient(circle at center, rgba(8, 3, 16, 0.3) 0%, rgba(8, 3, 16, 0.85) 75%, #080310 100%);
   pointer-events: none;
+}
+
+/* Atmospheric Image Backdrops for Hero, Garden, Lanterns */
+.scenic-bg-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.scenic-bg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: brightness(0.42) contrast(1.12);
+  transform: scale(1.04);
+}
+
+.scenic-bg-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(8, 3, 16, 0.35) 0%, rgba(8, 3, 16, 0.88) 75%, #080310 100%);
 }
 
 .constellation-glow-center {
@@ -3068,6 +3101,10 @@ body {
 
     <!-- HERO SECTION: THE ENTRY ENVELOPE & INVITATION -->
     <section class="section hero-section" id="hero">
+      <div class="scenic-bg-wrap">
+        <img src="assets/aurora-lake.jpg" alt="Sehrli qutb yog'dusi va sokin ko'l" class="scenic-bg-img" loading="eager" fetchpriority="high" decoding="async" />
+        <div class="scenic-bg-overlay"></div>
+      </div>
       <div class="hero-cosmic-glow"></div>
       <div class="container hero-content">
 
@@ -3528,6 +3565,10 @@ eternal.compile_happiness()</code></pre>
          Blooming floral garden growing and blossoming on scroll!
          ============================================================== -->
     <section class="section vector-interlude-section flower-bloom-section" id="stage-flower-bloom">
+      <div class="scenic-bg-wrap">
+        <img src="assets/magical-garden.jpg" alt="Sehrli gullar bog'i" class="scenic-bg-img" loading="lazy" decoding="async" />
+        <div class="scenic-bg-overlay"></div>
+      </div>
       <div class="interlude-glow-aura aura-flowers"></div>
       
       <!-- SVG Floral Garden Bloom -->
@@ -3611,6 +3652,10 @@ eternal.compile_happiness()</code></pre>
          Vector paper lanterns rising and lotus flowers floating!
          ============================================================== -->
     <section class="section vector-lanterns-section" id="stage-vector-lanterns">
+      <div class="scenic-bg-wrap">
+        <img src="assets/floating-lanterns.jpg" alt="Sehrli uchar chiroqlar osmoni" class="scenic-bg-img" loading="lazy" decoding="async" />
+        <div class="scenic-bg-overlay"></div>
+      </div>
       <div class="vector-lanterns-stage" id="vector-lanterns-stage">
         <!-- SVG Floating Lanterns -->
         <svg class="lanterns-svg" viewBox="0 0 900 600" preserveAspectRatio="xMidYMid slice">
@@ -4003,11 +4048,6 @@ eternal.compile_happiness()</code></pre>
         <div class="constellation-glow-center"></div>
       </div>
 
-      <!-- Feature The Uploaded Watercolor Couple Art -->
-      <div class="couple-art-feature-wrapper" id="couple-art-box">
-        <img src="assets/couple-art.png" alt="Yaxyo va Mushtariy — Qo'llar birlashgan baxt" class="couple-art-portrait" id="couple-art-portrait" loading="eager" fetchpriority="high" decoding="async" />
-      </div>
-
       <div class="cinematic-overlay-content">
         <div class="container text-center">
           
@@ -4020,6 +4060,11 @@ eternal.compile_happiness()</code></pre>
             Qo'llarimiz Birlashgan <br />
             <span class="serif-title italic glow-light">Har Bir Lahza — Mo'jiza</span>
           </h2>
+
+          <!-- Feature The Uploaded Watercolor Couple Art -->
+          <div class="couple-art-feature-wrapper" id="couple-art-box">
+            <img src="assets/couple-art.png" alt="Yaxyo va Mushtariy — Qo'llar birlashgan baxt" class="couple-art-portrait" id="couple-art-portrait" loading="eager" fetchpriority="high" decoding="async" />
+          </div>
 
           <div class="cinematic-card glass-panel-deep">
             <p class="cinematic-prose">
@@ -5271,72 +5316,59 @@ document.addEventListener('DOMContentLoaded', () => {
       ease: 'power3.out'
     });
 
-    // Chapter 1: Developer Terminal - Dynamic diagonal drift
-    gsap.from('#terminal-box', {
-      scrollTrigger: {
-        trigger: '#code-destiny',
-        start: 'top 80%',
-        toggleActions: 'play none none none'
-      },
-      opacity: 0,
-      x: -70,
-      y: 50,
-      rotation: -1.2,
-      duration: 1.2,
-      ease: 'power3.out'
-    });
-
-    // Subtle continuous horizontal pull on terminal when scrolling
-    gsap.to('#terminal-box', {
-      scrollTrigger: {
-        trigger: '#code-destiny',
-        start: 'top bottom',
-        end: 'bottom top',
-        scrub: 1.5
-      },
-      x: 40,
-      ease: 'none'
-    });
+    // Chapter 1: Developer Terminal
+    const terminalBox = document.getElementById('terminal-box');
+    if (terminalBox) {
+      gsap.fromTo(terminalBox,
+        { opacity: 0.15, y: 35 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: '#code-destiny',
+            start: 'top 85%',
+            toggleActions: 'play none none none'
+          }
+        }
+      );
+    }
 
     // Chapter 2: Happy 19 - Opposing horizontal and diagonal reveals
-    gsap.from('.happy-text-col > *', {
-      scrollTrigger: {
-        trigger: '#happy-19',
-        start: 'top 75%'
-      },
-      opacity: 0,
-      x: -60,
-      y: 30,
-      duration: 1,
-      stagger: 0.15,
-      ease: 'power3.out'
-    });
+    gsap.fromTo('.happy-text-col > *',
+      { opacity: 0.2, y: 25 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 1,
+        stagger: 0.15,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: '#happy-19',
+          start: 'top 85%',
+          toggleActions: 'play none none none'
+        }
+      }
+    );
 
-    gsap.from('.glass-artwork-frame', {
-      scrollTrigger: {
-        trigger: '#happy-19',
-        start: 'top 70%'
-      },
-      opacity: 0,
-      x: 80,
-      y: -30,
-      rotation: 2,
-      duration: 1.3,
-      ease: 'power3.out'
-    });
-
-    // Parallax on Happy 19 Artwork on scroll
-    gsap.to('.glass-artwork-frame', {
-      scrollTrigger: {
-        trigger: '#happy-19',
-        start: 'top bottom',
-        end: 'bottom top',
-        scrub: 1.5
-      },
-      y: -40,
-      x: -25,
-      ease: 'none'
-    });
+    const glassFrame = document.querySelector('.glass-artwork-frame');
+    if (glassFrame) {
+      gsap.fromTo(glassFrame,
+        { opacity: 0.2, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1.1,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: '#happy-19',
+            start: 'top 85%',
+            toggleActions: 'play none none none'
+          }
+        }
+      );
+    }
 
     // -------------------------------------------------------------
     // NATIONAL GEOGRAPHIC SIGNATURE: PINNED HORIZONTAL PANORAMA
@@ -5707,17 +5739,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // Chapter 3: Featured Uploaded Couple Artwork Reveal
     const couplePortrait = document.getElementById('couple-art-portrait');
     if (couplePortrait) {
-      gsap.from(couplePortrait, {
-        scale: 0.84,
-        y: 45,
-        opacity: 0,
-        duration: 1.3,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: '#clasped-hands',
-          start: 'top 75%'
+      gsap.fromTo(couplePortrait,
+        { scale: 0.92, y: 25, opacity: 0.2 },
+        {
+          scale: 1,
+          y: 0,
+          opacity: 1,
+          duration: 1.1,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: '#clasped-hands',
+            start: 'top 85%',
+            toggleActions: 'play none none none'
+          }
         }
-      });
+      );
     }
 
     // Chapter 3: Cinematic Clasped Hands - Sideway camera drift + zoom
@@ -5730,63 +5766,58 @@ document.addEventListener('DOMContentLoaded', () => {
           end: 'bottom top',
           scrub: 1.2
         },
-        y: -70,
-        x: -40,
-        scale: 1.2,
+        y: -50,
+        scale: 1.15,
         ease: 'none'
       });
     }
 
-    gsap.from('.cinematic-headline', {
-      scrollTrigger: {
-        trigger: '#clasped-hands',
-        start: 'top 70%'
-      },
-      opacity: 0,
-      x: 50,
-      y: 30,
-      duration: 1.2,
-      ease: 'power3.out'
-    });
+    gsap.fromTo('.cinematic-headline',
+      { opacity: 0.2, y: 20 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 1,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: '#clasped-hands',
+          start: 'top 85%',
+          toggleActions: 'play none none none'
+        }
+      }
+    );
 
-    gsap.from('.cinematic-card', {
-      scrollTrigger: {
-        trigger: '#clasped-hands',
-        start: 'top 65%'
-      },
-      opacity: 0,
-      y: 60,
-      x: -30,
-      duration: 1.3,
-      ease: 'power3.out'
-    });
+    gsap.fromTo('.cinematic-card',
+      { opacity: 0.2, y: 25 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 1,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: '#clasped-hands',
+          start: 'top 80%',
+          toggleActions: 'play none none none'
+        }
+      }
+    );
 
     // Chapter 4: Pillars Stagger - Alternating organic diagonal arrivals
-    gsap.from('.drift-diag-1', {
-      scrollTrigger: {
-        trigger: '#pillars',
-        start: 'top 75%'
-      },
-      opacity: 0,
-      x: -50,
-      y: 40,
-      duration: 1,
-      stagger: 0.2,
-      ease: 'power3.out'
-    });
-
-    gsap.from('.drift-diag-2', {
-      scrollTrigger: {
-        trigger: '#pillars',
-        start: 'top 75%'
-      },
-      opacity: 0,
-      x: 50,
-      y: 40,
-      duration: 1,
-      stagger: 0.2,
-      ease: 'power3.out'
-    });
+    gsap.fromTo('.drift-diag-1, .drift-diag-2',
+      { opacity: 0.2, y: 30 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 1,
+        stagger: 0.15,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: '#pillars',
+          start: 'top 85%',
+          toggleActions: 'play none none none'
+        }
+      }
+    );
 
     // -------------------------------------------------------------
     // NEW VECTOR PAGE 6: OQ KABUTARLAR VA SEVGI MAKTUBI
